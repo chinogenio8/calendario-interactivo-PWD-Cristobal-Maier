@@ -1,0 +1,208 @@
+body {
+    font-family: 'Roboto', Arial, Helvetica, sans-serif;
+    text-align: center;
+    background-color: #f5f5f5;
+    color: #333333;
+    margin: 0;
+    padding: 0;
+}
+
+.calendar {
+    width: 60%;
+    margin: 30px auto;
+    padding: 25px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.calendar__info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 18px;
+    font-weight: 500;
+    color: #424242;
+    padding: 10px 20px;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 15px;
+}
+
+.calendar__prev, .calendar__next {
+    background: #3f51b5;
+    color: #ffffff;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.calendar__prev:hover, .calendar__next:hover {
+    background: #303f9f;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.title {
+    color: #424242;
+    font-weight: 500;
+}
+
+.calendar-week {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    font-weight: 500;
+    color: #757575;
+    padding: 10px 0;
+    border-bottom: 1px solid #eeeeee;
+}
+
+.calendar__dates {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    padding: 15px 0;
+}
+
+.holiday-bridge {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    font-weight: 500;
+    border: 1px solid #c8e6c9;
+}
+
+.day {
+    padding: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.day:hover {
+    background: #f5f5f5;
+    border: 1px solid #e0e0e0;
+}
+
+.today {
+    background-color: #fdabab !important;
+    color: #fa6a6a;
+    font-weight: 500;
+    border: 1px solid #bbdefb !important;
+}
+
+.today:hover {
+    background-color: #ff9d9d !important;
+}
+
+.event {
+    background-color: #2196f3;
+    color: #ffffff;
+    padding: 5px;
+    border-radius: 4px;
+    font-weight: 500;
+    margin-top: 5px;
+    font-size: 0.8em;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    transition: all 0.2s ease;
+}
+
+.event:hover {
+    background-color: #1976d2;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.event-form {
+    margin: 25px auto;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    width: 60%;
+    border-top: 3px solid #3f51b5;
+}
+
+.holiday {
+    background-color: #e8eaf6;
+    color: #7d86bb;
+    font-weight: 500;
+    border-radius: 6px;
+    position: relative;
+    border: 1px solid #c5cae9;
+}
+
+.holiday:hover {
+    background-color: #c5cae9;
+}
+
+.weekend {
+    background-color: #f0fdc0;
+    color: #616161;
+    font-weight: 500;
+    border: 1px solid #eeeeee;
+}
+
+.weekend:hover {
+    background-color: #efffb7;
+}
+.holiday-text {
+    font-size: 0.7em;
+    color: #5c6bc0;
+    margin-top: 5px;
+    font-weight: 400;
+}
+
+input {
+    margin-top: 12px;
+    padding: 10px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: 14px;
+    width: auto;
+    transition: all 0.2s ease;
+    background-color: #f9f9f9;
+    color: #424242;
+}
+
+input:focus {
+    border-color: #3f51b5;
+    box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.2);
+    outline: none;
+    background-color: #ffffff;
+}
+
+#save-event, #delete-event {
+    background: #3f51b5;
+    color: #ffffff;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: auto;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 4px;
+    margin-top: 15px;
+    font-weight: 500;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+#save-event:hover, #delete-event:hover {
+    background: #303f9f;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+#delete-event {
+    background: #f44336;
+    margin-left: 10px;
+}
+
+#delete-event:hover {
+    background: #d32f2f;
+}
+
+button:hover {
+    background: #303f9f;
+    transform: translateY(-1px);
+}
