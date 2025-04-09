@@ -1,3 +1,5 @@
+![image](https://github.com/user-attachments/assets/697b4bf0-6962-45d9-9596-4e4212133d4d)
+
 # Calendario Divertido 
 
 ¡Bienvenido a Calendario Divertido! Un calendario interactivo y colorido diseñado especialmente para niños que buscan una experiencia más alegre y lúdica.
