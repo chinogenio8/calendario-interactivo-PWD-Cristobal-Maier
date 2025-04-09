@@ -1,162 +1,299 @@
-// Nombres de los meses para mostrar en el calendario
-const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre",
-    "Octubre", "Noviembre", "Diciembre"];
+document.addEventListener('DOMContentLoaded', function () {
+    const monthNames = [
+        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ];
+    
+    // Variables globales
+    let date = new Date();
+    let currentMonth = date.getMonth();
+    let currentYear = date.getFullYear();
+    let selectedDate = null;
+    let events = JSON.parse(localStorage.getItem('calendarEvents')) || {};
 
-// Contenedor donde se mostrarán los días del mes
-const datesContainer = document.getElementById("dates");
-const monthElement = document.getElementById("month");
-const yearElement = document.getElementById("year");
-const eventDateInput = document.getElementById("event-date");
-const eventTitleInput = document.getElementById("event-title");
-const saveEventButton = document.getElementById("save-event");
-const deleteEventButton = document.createElement("button");
+    // Referencias a elementos DOM
+    const datesContainer = document.getElementById('dates');
+    const monthDisplay = document.getElementById('month');
+    const yearDisplay = document.getElementById('year');
+    const prevBtn = document.getElementById('prev-month');
+    const nextBtn = document.getElementById('next-month');
+    const eventDateInput = document.getElementById('event-date');
+    const eventTitleInput = document.getElementById('event-title');
+    const saveEventBtn = document.getElementById('save-event');
+    const deleteEventBtn = document.getElementById('delete-event');
 
-// Botón para eliminar un evento
-deleteEventButton.id = "delete-event";
-deleteEventButton.textContent = "Eliminar Evento";
-deleteEventButton.style.display = "none";
-deleteEventButton.style.marginLeft = "10px";
-document.querySelector(".event-form").appendChild(deleteEventButton);
-
-// Obtener el mes y año actuales
-let currentMonth = new Date().getMonth();
-let currentYear = new Date().getFullYear();
-let today = new Date(); // Obtener la fecha actual
-let events = JSON.parse(localStorage.getItem("events")) || {};
-
-// Lista de feriados nacionales en Argentina (Formato: "MM-DD")
-const feriadosArgentina = {
-    "01-01": "Año Nuevo",
-    "02-12": "Carnaval",
-    "02-13": "Carnaval",
-    "03-24": "Día de la Memoria",
-    "04-02": "Día del Veterano y Caídos en Malvinas",
-    "05-01": "Día del Trabajador",
-    "05-25": "Día de la Revolución de Mayo",
-    "06-20": "Día de la Bandera",
-    "07-09": "Día de la Independencia",
-    "08-17": "Paso a la Inmortalidad de San Martín",
-    "10-12": "Día del Respeto a la Diversidad Cultural",
-    "11-20": "Día de la Soberanía Nacional",
-    "12-08": "Inmaculada Concepción",
-    "12-25": "Navidad"
-};
-
-// Función para determinar si el año es bisiesto
-function isLeapYear(year) {
-    return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
-}
-
-// Función para cargar el calendario
-function loadCalendar(month = currentMonth, year = currentYear) {
-    datesContainer.innerHTML = "";
-    monthElement.textContent = monthNames[month];
-    yearElement.textContent = year;
-
-    let firstDay = new Date(year, month, 1).getDay();
-    firstDay = (firstDay === 0) ? 6 : firstDay - 1; // Ajuste para que la semana empiece en lunes
-
-    // Obtener el número de días del mes
-    let totalDays = new Date(year, month + 1, 0).getDate();
-    if (month === 1 && isLeapYear(year)) {
-        totalDays = 29;
+    // Inicializar el calendario
+    function initCalendar() {
+        renderCalendar();
+        setupEventListeners();
     }
 
-    // Agregar días en blanco antes del primer día del mes
-    for (let i = 0; i < firstDay; i++) {
-        let emptyDay = document.createElement("div");
-        emptyDay.classList.add("day", "empty");
-        datesContainer.appendChild(emptyDay);
+    // Renderizar el calendario
+    function renderCalendar() {
+        datesContainer.innerHTML = '';
+        monthDisplay.textContent = monthNames[currentMonth];
+        yearDisplay.textContent = currentYear;
+
+        // Obtener el primer día del mes y el total de días
+        const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+        
+        // Ajustar el primer día (0 es domingo, 1 es lunes)
+        const startingDay = firstDay === 0 ? 6 : firstDay - 1;
+        
+        // Crear los espacios vacíos iniciales
+        for (let i = 0; i < startingDay; i++) {
+            const dateElement = document.createElement('div');
+            dateElement.classList.add('calendar__date', 'empty');
+            datesContainer.appendChild(dateElement);
+        }
+        
+        // Crear los días del mes
+        const today = new Date();
+        for (let i = 1; i <= daysInMonth; i++) {
+            const dateElement = document.createElement('div');
+            dateElement.classList.add('calendar__date');
+            
+            const dateNumber = document.createElement('span');
+            dateNumber.textContent = i;
+            dateElement.appendChild(dateNumber);
+            
+            // Verificar si es el día actual
+            if (
+                currentYear === today.getFullYear() &&
+                currentMonth === today.getMonth() &&
+                i === today.getDate()
+            ) {
+                dateElement.classList.add('today');
+            }
+            
+            // Verificar si es fin de semana
+            const date = new Date(currentYear, currentMonth, i);
+            const dayOfWeek = date.getDay();
+            if (dayOfWeek === 6 || dayOfWeek === 0) {
+                dateElement.classList.add('weekend');
+            }
+            
+            // Verificar si es feriado
+            const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+            const monthDay = `${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+            
+            // Lista de feriados nacionales en Argentina
+            const feriados = {
+                '01-01': 'Año Nuevo',
+                '05-01': 'Día del Trabajador',
+                '05-25': 'Día de la Revolución de Mayo',
+                '07-09': 'Día de la Independencia',
+                '12-25': 'Navidad'
+            };
+            
+            if (feriados[monthDay]) {
+                dateElement.classList.add('holiday');
+                const holidayText = document.createElement('div');
+                holidayText.classList.add('holiday-text');
+                holidayText.textContent = feriados[monthDay];
+                dateElement.appendChild(holidayText);
+            }
+            
+            // Verificar si hay eventos en esta fecha
+            if (events[dateStr]) {
+                dateElement.classList.add('has-event');
+            }
+            
+            // Verificar si es la fecha seleccionada
+            if (
+                selectedDate &&
+                currentYear === selectedDate.getFullYear() &&
+                currentMonth === selectedDate.getMonth() &&
+                i === selectedDate.getDate()
+            ) {
+                dateElement.classList.add('active');
+            }
+            
+            // Añadir atributo de datos para el día
+            dateElement.dataset.date = dateStr;
+            
+            // Añadir evento click a cada día
+            dateElement.addEventListener('click', function() {
+                selectDate(dateStr);
+            });
+            
+            datesContainer.appendChild(dateElement);
+        }
+        
+        // Añadir efectos visuales aleatorios a los días
+        addVisualEffects();
     }
 
-    for (let i = 1; i <= totalDays; i++) {
-        let day = document.createElement("div");
-        day.classList.add("day");
-        day.textContent = i;
+    // Añadir efectos visuales aleatorios a los días
+    function addVisualEffects() {
+        const dateElements = document.querySelectorAll('.calendar__date:not(.empty)');
+        dateElements.forEach((el, index) => {
+            // Crear variedad visual con colores sutiles
 
-        let dateKey = `${year}-${String(month + 1).padStart(2, "0")}-${String(i).padStart(2, "0")}`;
-        let holidayKey = `${String(month + 1).padStart(2, "0")}-${String(i).padStart(2, "0")}`;
-
-        // Resaltar el día actual
-        if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
-            day.classList.add("today");
-        }
-
-        // Verificar si el día es un feriado
-        if (feriadosArgentina[holidayKey]) {
-            day.classList.add("holiday");
-            let holidayText = document.createElement("div");
-            holidayText.classList.add("holiday-text");
-            holidayText.textContent = feriadosArgentina[holidayKey];
-            day.appendChild(holidayText);
-        }
-
-        // Si el día es fin de semana y también un feriado, debe mostrar el color del feriado, no del fin de semana
-        let dayOfWeek = new Date(year, month, i).getDay(); // 0 = domingo, 6 = sábado
-        if ((dayOfWeek === 6 || dayOfWeek === 0) && !feriadosArgentina[holidayKey]) {
-            day.classList.add("weekend"); // Si es fin de semana y no feriado, aplica el color de fin de semana
-        }
-
-        if (events[dateKey]) {
-            let eventDiv = document.createElement("div");
-            eventDiv.classList.add("event");
-            eventDiv.textContent = events[dateKey];
-            day.appendChild(eventDiv);
-        }
-
-        day.addEventListener("click", () => {
-            eventDateInput.value = dateKey;
-            eventTitleInput.value = events[dateKey] || "";
-            deleteEventButton.style.display = events[dateKey] ? "inline-block" : "none";
+            
+            
         });
-
-        datesContainer.appendChild(day);
     }
-}
 
-// Evento para guardar un evento
-saveEventButton.addEventListener("click", () => {
-    let date = eventDateInput.value;
-    let title = eventTitleInput.value.trim();
-    if (!date || !title) return;
-
-    events[date] = title;
-    localStorage.setItem("events", JSON.stringify(events));
-    loadCalendar();
-    deleteEventButton.style.display = "inline-block";
-});
-
-// Evento para eliminar un evento
-deleteEventButton.addEventListener("click", () => {
-    let date = eventDateInput.value;
-    if (events[date]) {
-        delete events[date];
-        localStorage.setItem("events", JSON.stringify(events));
-        loadCalendar();
-        eventTitleInput.value = "";
-        deleteEventButton.style.display = "none";
+    // Configurar los event listeners
+    function setupEventListeners() {
+        prevBtn.addEventListener('click', function() {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            renderCalendar();
+        });
+        
+        nextBtn.addEventListener('click', function() {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalendar();
+        });
+        
+        saveEventBtn.addEventListener('click', saveEvent);
+        deleteEventBtn.addEventListener('click', deleteEvent);
     }
-});
 
-// Para cambiar al mes anterior
-document.getElementById("prev-month").addEventListener("click", () => {
-    currentMonth--;
-    if (currentMonth < 0) {
-        currentMonth = 11;
-        currentYear--;
+    // Seleccionar una fecha
+    function selectDate(dateStr) {
+        // Remover clase active de todos los días
+        const allDates = document.querySelectorAll('.calendar__date');
+        allDates.forEach(date => date.classList.remove('active'));
+        
+        // Añadir clase active a la fecha seleccionada
+        const selectedElement = document.querySelector(`.calendar__date[data-date="${dateStr}"]`);
+        if (selectedElement) {
+            selectedElement.classList.add('active');
+        }
+        
+        // Actualizar fecha seleccionada
+        const [year, month, day] = dateStr.split('-').map(Number);
+        selectedDate = new Date(year, month - 1, day);
+        
+        // Actualizar el input de fecha
+        eventDateInput.value = dateStr;
+        
+        // Verificar si hay eventos y mostrar/ocultar botón eliminar
+        if (events[dateStr]) {
+            eventTitleInput.value = events[dateStr];
+            deleteEventBtn.style.display = 'block';
+        } else {
+            eventTitleInput.value = '';
+            deleteEventBtn.style.display = 'none';
+        }
+        
+        // Animación divertida al seleccionar una fecha
+        if (selectedElement) {
+            selectedElement.style.animation = 'bounce 0.5s';
+            setTimeout(() => {
+                selectedElement.style.animation = '';
+            }, 500);
+        }
     }
-    loadCalendar(currentMonth, currentYear);
-});
 
-// Para cambiar al mes siguiente
-document.getElementById("next-month").addEventListener("click", () => {
-    currentMonth++;
-    if (currentMonth > 11) {
-        currentMonth = 0;
-        currentYear++;
+    // Guardar un evento
+    function saveEvent() {
+        const dateStr = eventDateInput.value;
+        const title = eventTitleInput.value.trim();
+        
+        if (!dateStr || !title) {
+            // Animación de sacudida si falta información
+            eventDateInput.style.animation = title ? '' : 'shake 0.5s';
+            eventTitleInput.style.animation = dateStr ? '' : 'shake 0.5s';
+            
+            setTimeout(() => {
+                eventDateInput.style.animation = '';
+                eventTitleInput.style.animation = '';
+            }, 500);
+            return;
+        }
+        
+        // Guardar evento
+        events[dateStr] = title;
+        localStorage.setItem('calendarEvents', JSON.stringify(events));
+        
+        // Actualizar calendario
+        renderCalendar();
+        
+        // Reiniciar formulario
+        eventTitleInput.value = '';
+        deleteEventBtn.style.display = 'block';
+        
+        // Mensaje de confirmación con animación
+        const eventForm = document.querySelector('.event-form');
+        const confirmMessage = document.createElement('div');
+        confirmMessage.textContent = '¡Evento guardado!';
+        confirmMessage.style.backgroundColor = '#98CE00';
+        confirmMessage.style.color = 'white';
+        confirmMessage.style.padding = '10px';
+        confirmMessage.style.borderRadius = '10px';
+        confirmMessage.style.textAlign = 'center';
+        confirmMessage.style.marginTop = '10px';
+        confirmMessage.style.fontWeight = 'bold';
+        confirmMessage.style.opacity = '0';
+        confirmMessage.style.transition = 'opacity 0.5s';
+        
+        eventForm.appendChild(confirmMessage);
+        setTimeout(() => {
+            confirmMessage.style.opacity = '1';
+        }, 10);
+        
+        setTimeout(() => {
+            confirmMessage.style.opacity = '0';
+            setTimeout(() => {
+                confirmMessage.remove();
+            }, 500);
+        }, 2000);
     }
-    loadCalendar(currentMonth, currentYear);
-});
 
-// Inicializar el calendario al cargar la página
-loadCalendar();
+    // Eliminar un evento
+    function deleteEvent() {
+        const dateStr = eventDateInput.value;
+        
+        if (dateStr && events[dateStr]) {
+            delete events[dateStr];
+            localStorage.setItem('calendarEvents', JSON.stringify(events));
+            
+            // Actualizar calendario
+            renderCalendar();
+            
+            // Reiniciar formulario
+            eventTitleInput.value = '';
+            deleteEventBtn.style.display = 'none';
+            
+            // Mensaje de confirmación
+            const eventForm = document.querySelector('.event-form');
+            const confirmMessage = document.createElement('div');
+            confirmMessage.textContent = '¡Evento eliminado!';
+            confirmMessage.style.backgroundColor = '#FF5252';
+            confirmMessage.style.color = 'white';
+            confirmMessage.style.padding = '10px';
+            confirmMessage.style.borderRadius = '10px';
+            confirmMessage.style.textAlign = 'center';
+            confirmMessage.style.marginTop = '10px';
+            confirmMessage.style.fontWeight = 'bold';
+            confirmMessage.style.opacity = '0';
+            confirmMessage.style.transition = 'opacity 0.5s';
+            
+            eventForm.appendChild(confirmMessage);
+            setTimeout(() => {
+                confirmMessage.style.opacity = '1';
+            }, 10);
+            
+            setTimeout(() => {
+                confirmMessage.style.opacity = '0';
+                setTimeout(() => {
+                    confirmMessage.remove();
+                }, 500);
+            }, 2000);
+        }
+    }
+    // Inicializar
+    initCalendar();
+});

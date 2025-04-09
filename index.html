@@ -4,19 +4,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📅 Calendario Interactivo</title>
+    <title>Calendario Divertido</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 
 <body>
-    <h1 class="title">📆 Calendario Interactivo</h1>
+    <h1 class="title">Calendario Divertido!!!</h1>
     <div class="calendar">
         <div class="calendar__info">
-            <button class="calendar__prev" id="prev-month">◀</button>
+            <button class="calendar__prev" id="prev-month"><i class="fas fa-chevron-left"></i></button>
             <div class="calendar__month" id="month">Enero</div>
             <div class="calendar__year" id="year">2025</div>
-            <button class="calendar__next" id="next-month">▶</button>
+            <button class="calendar__next" id="next-month"><i class="fas fa-chevron-right"></i></button>
         </div>
+        
         <div class="calendar-week">
             <div class="calendar__day">Lun</div>
             <div class="calendar__day">Mar</div>
@@ -29,11 +31,11 @@
         <div class="calendar__dates" id="dates"></div>
     </div>
     <div class="event-form">
-        <h2>📝 Agregar Evento</h2>
+        <h2><i class="fas fa-pencil-alt"></i> Mis Eventos Especiales</h2>
         <input type="date" id="event-date">
-        <input type="text" id="event-title" placeholder="Descripción del evento">
-        <button id="save-event">Guardar Evento</button>
-        <button id="delete-event" style="display: none;">Eliminar Evento</button> 
+        <input type="text" id="event-title" placeholder="¿Qué vamos a hacer?">
+        <button id="save-event"><i class="fas fa-save"></i> ¡Guardar!</button>
+        <button id="delete-event" style="display: none;"><i class="fas fa-trash-alt"></i> Borrar</button> 
     </div>
     <script src="script.js"></script>
 </body>
